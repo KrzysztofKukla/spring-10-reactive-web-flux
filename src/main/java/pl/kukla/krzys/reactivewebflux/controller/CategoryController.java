@@ -14,13 +14,15 @@ import reactor.core.publisher.Mono;
  * @author Krzysztof Kukla
  */
 @RestController
-@RequestMapping("/v1/categories")
+@RequestMapping(CategoryController.V1_CATEGORIES_BASE_URL)
 @RequiredArgsConstructor
 public class CategoryController {
+    static final String V1_CATEGORIES_BASE_URL = "/v1/categories";
+
     private final CategoryRepository categoryRepository;
 
     @GetMapping
-    public Flux<Category> getCategories() {
+    public Flux<Category> getAll() {
         return categoryRepository.findAll();
     }
 
