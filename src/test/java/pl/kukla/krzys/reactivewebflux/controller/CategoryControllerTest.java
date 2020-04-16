@@ -8,6 +8,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,6 +49,7 @@ class CategoryControllerTest {
         webTestClient.get().uri(CategoryController.V1_CATEGORIES_BASE_URL)
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
+            .expectStatus().isOk()
             .expectBodyList(Category.class)
             .hasSize(2);
 
@@ -62,9 +64,24 @@ class CategoryControllerTest {
 
         webTestClient.get().uri(CategoryController.V1_CATEGORIES_BASE_URL + "/{id}", "1")
             .exchange()
+            .expectStatus().isOk()
             .expectBody(Category.class);
 
         BDDMockito.then(categoryRepository).should().findById(ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void createCategory() throws Exception {
+        Category categoryToSave = Category.builder().id("1").description("d").build();
+        BDDMockito.given(categoryRepository.saveAll(ArgumentMatchers.any(Publisher.class))).willReturn(Flux.just(categoryToSave));
+
+        webTestClient.post()
+            .uri(CategoryController.V1_CATEGORIES_BASE_URL)
+            .body(Mono.just(categoryToSave), Category.class)
+            .exchange()
+            .expectStatus().isCreated();
+
+        BDDMockito.then(categoryRepository).should().saveAll(ArgumentMatchers.any(Publisher.class));
     }
 
 }
