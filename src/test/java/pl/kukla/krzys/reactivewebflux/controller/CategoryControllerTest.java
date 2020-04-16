@@ -50,6 +50,8 @@ class CategoryControllerTest {
             .exchange()
             .expectBodyList(Category.class)
             .hasSize(2);
+
+        BDDMockito.then(categoryRepository).should().findAll();
     }
 
     @Test
@@ -58,9 +60,11 @@ class CategoryControllerTest {
 
         BDDMockito.given(categoryRepository.findById(ArgumentMatchers.anyString())).willReturn(Mono.just(category));
 
-        webTestClient.get().uri(CategoryController.V1_CATEGORIES_BASE_URL)
+        webTestClient.get().uri(CategoryController.V1_CATEGORIES_BASE_URL + "/{id}", "1")
             .exchange()
             .expectBody(Category.class);
+
+        BDDMockito.then(categoryRepository).should().findById(ArgumentMatchers.anyString());
     }
 
 }
