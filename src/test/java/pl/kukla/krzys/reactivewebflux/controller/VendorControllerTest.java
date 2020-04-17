@@ -8,6 +8,7 @@ import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import pl.kukla.krzys.reactivewebflux.domain.Vendor;
@@ -30,6 +31,7 @@ class VendorControllerTest {
     @InjectMocks
     private VendorController vendorController;
 
+    //reactive Web Flux Test Client
     private WebTestClient webTestClient;
 
     @BeforeEach
@@ -68,6 +70,20 @@ class VendorControllerTest {
             .expectBody(Vendor.class);
 
         BDDMockito.then(vendorRepository).should().findById(ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void createVendor() throws Exception {
+        Vendor vendorToSave = Vendor.builder().id("1").firstName("first").lastName("last").build();
+
+        BDDMockito.given(vendorRepository.saveAll(ArgumentMatchers.any(Publisher.class))).willReturn(Flux.just(vendorToSave));
+
+        webTestClient.post()
+            .uri(VendorController.V1_VENDORS_BASE_URL + "/{id}", "1")
+            .body(Mono.just(vendorToSave), Vendor.class)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectBody(Vendor.class);
     }
 
 }
