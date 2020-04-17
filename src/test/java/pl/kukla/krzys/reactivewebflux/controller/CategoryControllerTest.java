@@ -84,4 +84,19 @@ class CategoryControllerTest {
         BDDMockito.then(categoryRepository).should().saveAll(ArgumentMatchers.any(Publisher.class));
     }
 
+    @Test
+    void updateCategory() throws Exception {
+        Category categoryToUpdate = Category.builder().id("1").description("desc").build();
+
+        BDDMockito.given(categoryRepository.save(ArgumentMatchers.any(Category.class))).willReturn(Mono.just(categoryToUpdate));
+
+        webTestClient.put()
+            .uri(CategoryController.V1_CATEGORIES_BASE_URL + "/{id}", "1")
+            .body(Mono.just(categoryToUpdate), Category.class)
+            .exchange()
+            .expectStatus().isOk();
+
+        BDDMockito.then(categoryRepository).should().save(ArgumentMatchers.any(Category.class));
+    }
+
 }
