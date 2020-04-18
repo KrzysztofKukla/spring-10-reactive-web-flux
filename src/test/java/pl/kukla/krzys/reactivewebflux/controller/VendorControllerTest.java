@@ -86,4 +86,19 @@ class VendorControllerTest {
             .expectBody(Vendor.class);
     }
 
+    @Test
+    void updateVendor() throws Exception {
+        Vendor vendorToUpdate = Vendor.builder().id("1").firstName("f1").lastName("l1").build();
+        BDDMockito.given(vendorRepository.save(ArgumentMatchers.any(Vendor.class))).willReturn(Mono.just(vendorToUpdate));
+
+        webTestClient.put()
+            .uri(VendorController.V1_VENDORS_BASE_URL + "/{id}", "1")
+            .body(Mono.just(vendorToUpdate), Vendor.class)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Vendor.class);
+
+        BDDMockito.then(vendorRepository).should().save(ArgumentMatchers.any(Vendor.class));
+    }
+
 }

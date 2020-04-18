@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,6 +43,13 @@ public class VendorController {
     @PostMapping("/{id}")
     public Mono<Void> createVendor(@Valid @RequestBody Publisher<Vendor> vendorStream) {
         return vendorRepository.saveAll(vendorStream).then();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public Mono<Vendor> updateVendor(@PathVariable String id, @Valid @RequestBody Vendor vendor) {
+        vendor.setId(id);
+        return vendorRepository.save(vendor);
     }
 
 }
