@@ -52,4 +52,6 @@ public class VendorController {
         return vendorRepository.save(vendor);
     }
 
+    //Patch is used rarely
+    //Patch is an operation to partially update the resource
 }
